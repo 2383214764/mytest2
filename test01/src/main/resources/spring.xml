@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--
+        事务管理器
+    -->
+    <bean id="txtManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!--
+        制定参与事务的规则
+    -->
+    <tx:advice id="txAdvice" transaction-manager="txtManager">
+        <tx:attributes>
+            <tx:method name="*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+        </tx:attributes>
+    </tx:advice>
+
+
+    <!--
+        AOP配置声明式事务，指定切点
+    -->
+    <aop:config>
+        <aop:pointcut id="tranpointcut" expression="execution(* com.itheima.service.impl.*.*(..))" />
+
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="tranpointcut" />
+    </aop:config>
+
+
+
+    <!--引入mybatis配置-->
+    <import resource="spring-mybatis.xml" />
+
+</beans>
